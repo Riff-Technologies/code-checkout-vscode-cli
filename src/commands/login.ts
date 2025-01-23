@@ -5,7 +5,7 @@ import {
   confirmationPrompt,
   LoginAnswers,
 } from "../utils/prompts";
-import { registerUser, confirmUser } from "../utils/api";
+import { registerUser, confirmUser, loginUser } from "../utils/api";
 import { saveConfig } from "../utils/config";
 
 export default class Login extends Command {
@@ -19,12 +19,14 @@ export default class Login extends Command {
 
       // Step 1: Collect user information and register
       const answers = await prompt<LoginAnswers>(loginPrompts);
+      const { email: username, password } = answers;
       this.log("Creating your account...");
 
+      // Register the user
       await registerUser({
-        username: answers.email,
-        email: answers.email,
-        password: answers.password,
+        username,
+        email: username,
+        password,
         givenName: answers.givenName,
         familyName: answers.familyName,
         company: answers.company,
@@ -33,34 +35,85 @@ export default class Login extends Command {
 
       this.log("✅ Account created! Check your email for a confirmation code.");
 
-      // Step 2: Get confirmation code and confirm account
-      const confirmation = await prompt<LoginAnswers>(confirmationPrompt);
-      this.log("Confirming your account...");
+      // Step 2: Get confirmation code and retry if invalid
+      let confirmationAttempts = 0;
+      const maxAttempts = 3;
 
-      const response = await confirmUser({
-        username: answers.email,
-        confirmationCode: confirmation.confirmationCode || "",
-      });
+      while (confirmationAttempts < maxAttempts) {
+        const confirmation = await prompt<LoginAnswers>(confirmationPrompt);
+        this.log("Confirming your account...");
 
-      // Step 3: Save configuration
-      await saveConfig({
-        publisherId: response.publisherId,
-        jwt: response.jwt,
-        username: response.username,
-      });
+        try {
+          // Confirm the account
+          await confirmUser({
+            username,
+            confirmationCode: confirmation.confirmationCode || "",
+          });
 
-      this.log("✅ Successfully logged in!");
-      this.log(`Your Publisher ID is: ${response.publisherId}`);
-      this.log("\nNext steps:");
-      this.log("1. Link your Stripe account: code-checkout link-stripe");
-      this.log("2. Create your software: code-checkout create-software");
+          // If we get here, confirmation was successful
+          break;
+        } catch (error) {
+          confirmationAttempts++;
+          if (confirmationAttempts === maxAttempts) {
+            throw new Error(
+              "Maximum confirmation attempts reached. Please start over and try again."
+            );
+          }
+          this.log(
+            `❌ Invalid confirmation code. ${
+              maxAttempts - confirmationAttempts
+            } attempts remaining.`
+          );
+        }
+      }
+
+      // Step 3: Log in the user
+      this.log("Logging in...");
+      const loginResponse = await loginUser({ username, password });
+
+      if (!loginResponse.tokens?.idToken) {
+        throw new Error(
+          "Invalid response from server: missing authentication tokens. Please contact support."
+        );
+      }
+
+      // Extract publisher ID from the ID token
+      const idToken = loginResponse.tokens.idToken;
+      const tokenParts = idToken.split(".");
+      if (tokenParts.length !== 3) {
+        throw new Error("Invalid ID token format");
+      }
+
+      try {
+        const payload = JSON.parse(
+          Buffer.from(tokenParts[1], "base64").toString()
+        );
+        const publisherId = payload["custom:publisherId"];
+
+        if (!publisherId) {
+          throw new Error("Publisher ID not found in token");
+        }
+
+        // Save the configuration with the login tokens
+        await saveConfig({
+          publisherId,
+          jwt: idToken,
+          username,
+        });
+
+        this.log("✅ Successfully logged in!");
+        this.log(`Your Publisher ID is: ${publisherId}`);
+        this.log("\nNext steps:");
+        this.log("1. Link your Stripe account: code-checkout link-stripe");
+        this.log("2. Create your software: code-checkout create-software");
+      } catch (error) {
+        throw new Error(
+          "Failed to extract publisher ID from token. Please contact support."
+        );
+      }
     } catch (error) {
-      this.handleError(error as Error);
-    }
-  }
-
-  private handleError(error: Error): never {
-    this.error(`❌ Authentication failed: ${error.message}
+      this.error(`❌ Authentication failed: ${(error as Error).message}
 Try again or contact support if the problem persists.`);
+    }
   }
 }

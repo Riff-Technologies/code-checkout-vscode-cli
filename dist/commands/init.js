@@ -63,13 +63,12 @@ Try again or contact support if the problem persists.`);
         // Get confirmation code and retry if invalid
         let confirmationAttempts = 0;
         const maxAttempts = 3;
-        let confirmResponse;
         while (confirmationAttempts < maxAttempts) {
             const confirmation = await (0, prompts_1.prompt)(prompts_1.confirmationPrompt);
             this.log("Confirming your account...");
             try {
                 // Confirm the account
-                confirmResponse = await (0, api_1.confirmUser)({
+                await (0, api_1.confirmUser)({
                     username,
                     confirmationCode: confirmation.confirmationCode || "",
                 });
@@ -84,24 +83,40 @@ Try again or contact support if the problem persists.`);
                 this.log(`❌ Invalid confirmation code. ${maxAttempts - confirmationAttempts} attempts remaining.`);
             }
         }
-        if (!confirmResponse?.publisherId || !confirmResponse?.jwt) {
-            throw new Error("Invalid response from server: missing authentication data. Please contact support.");
-        }
         // Log in the user
         this.log("Logging in...");
         const loginResponse = await (0, api_1.loginUser)({ username, password });
-        // Save the configuration with the login tokens
-        await (0, config_1.saveConfig)({
-            publisherId: confirmResponse.publisherId,
-            jwt: loginResponse.tokens.idToken,
-            username: confirmResponse.username,
-        });
-        // Verify the config was saved
-        const config = (0, config_1.getConfig)();
-        if (!config.publisherId || !config.jwt) {
-            throw new Error("Failed to save authentication data. Please check file permissions.");
+        if (!loginResponse.tokens?.idToken) {
+            throw new Error("Invalid response from server: missing authentication tokens. Please contact support.");
         }
-        this.log("✅ Successfully logged in!");
+        // Extract publisher ID from the ID token
+        const idToken = loginResponse.tokens.idToken;
+        const tokenParts = idToken.split(".");
+        if (tokenParts.length !== 3) {
+            throw new Error("Invalid ID token format");
+        }
+        try {
+            const payload = JSON.parse(Buffer.from(tokenParts[1], "base64").toString());
+            const publisherId = payload["custom:publisherId"];
+            if (!publisherId) {
+                throw new Error("Publisher ID not found in token");
+            }
+            // Save the configuration with the login tokens
+            await (0, config_1.saveConfig)({
+                publisherId,
+                jwt: idToken,
+                username,
+            });
+            // Verify the config was saved
+            const config = (0, config_1.getConfig)();
+            if (!config.publisherId || !config.jwt) {
+                throw new Error("Failed to save authentication data. Please check file permissions.");
+            }
+            this.log("✅ Successfully logged in!");
+        }
+        catch (error) {
+            throw new Error("Failed to extract publisher ID from token. Please contact support.");
+        }
     }
     async handleStripeLink() {
         this.log("Generating Stripe onboarding link...");

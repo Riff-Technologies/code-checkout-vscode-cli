@@ -10,6 +10,7 @@ import {
   UserConfirmationRequest,
   UserLoginRequest,
   UserLoginResponse,
+  ConfirmationResponse,
 } from "../types";
 
 // Log the API URL being used (helpful for debugging)
@@ -77,13 +78,13 @@ export async function registerUser(
  */
 export async function confirmUser(
   confirmationData: UserConfirmationRequest
-): Promise<CognitoSignUpResponse> {
+): Promise<ConfirmationResponse> {
   try {
     if (env.debug) {
       console.log("Confirming user with data:", confirmationData);
     }
 
-    const response = await api.post<CognitoSignUpResponse>(
+    const response = await api.post<ConfirmationResponse>(
       "/users/confirm",
       confirmationData
     );
@@ -100,10 +101,10 @@ export async function confirmUser(
     // Log each expected field
     if (env.debug) {
       console.log("Response fields:", {
-        hasPublisherId: Boolean(response.data.publisherId),
-        hasJwt: Boolean(response.data.jwt),
+        hasMessage: Boolean(response.data.message),
         hasUsername: Boolean(response.data.username),
-        publisherId: response.data.publisherId,
+        message: response.data.message,
+        username: response.data.username,
       });
     }
 

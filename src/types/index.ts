@@ -51,11 +51,18 @@ export interface UserConfirmationRequest {
 }
 
 /**
+ * Response from confirmation
+ */
+export interface ConfirmationResponse {
+  message: string;
+  username: string;
+}
+
+/**
  * Response from Cognito signup
  */
 export interface CognitoSignUpResponse {
-  publisherId: string;
-  jwt: string;
+  message: string;
   username: string;
 }
 

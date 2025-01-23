@@ -1,4 +1,4 @@
-import { CognitoSignUpResponse, SoftwareResponse, PricingRequest, UserRegistrationRequest, UserConfirmationRequest, UserLoginRequest, UserLoginResponse } from "../types";
+import { SoftwareResponse, PricingRequest, UserRegistrationRequest, UserConfirmationRequest, UserLoginRequest, UserLoginResponse, ConfirmationResponse } from "../types";
 /**
  * Register a new user
  */
@@ -6,7 +6,7 @@ export declare function registerUser(userData: UserRegistrationRequest): Promise
 /**
  * Confirm user registration
  */
-export declare function confirmUser(confirmationData: UserConfirmationRequest): Promise<CognitoSignUpResponse>;
+export declare function confirmUser(confirmationData: UserConfirmationRequest): Promise<ConfirmationResponse>;
 /**
  * Get Stripe onboarding link
  */

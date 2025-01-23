@@ -97,10 +97,10 @@ async function confirmUser(confirmationData) {
         // Log each expected field
         if (env_1.env.debug) {
             console.log("Response fields:", {
-                hasPublisherId: Boolean(response.data.publisherId),
-                hasJwt: Boolean(response.data.jwt),
+                hasMessage: Boolean(response.data.message),
                 hasUsername: Boolean(response.data.username),
-                publisherId: response.data.publisherId,
+                message: response.data.message,
+                username: response.data.username,
             });
         }
         return response.data;
