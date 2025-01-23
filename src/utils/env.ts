@@ -4,8 +4,8 @@ import { config } from "dotenv";
 config();
 
 // Determine if we're running from a production build by checking if the code is minified/optimized
-const isProductionBuild = false;
-//__filename.includes("/dist/") || __filename.includes("\\dist\\");
+const isProductionBuild =
+  __filename.includes("/dist/") || __filename.includes("\\dist\\");
 
 /**
  * Environment variables configuration
