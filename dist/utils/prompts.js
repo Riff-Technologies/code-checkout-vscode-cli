@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.prompt = exports.pricingPrompts = exports.confirmationPrompt = exports.loginPrompts = void 0;
+exports.prompt = exports.revokePrompts = exports.licensePrompts = exports.pricingPrompts = exports.confirmationPrompt = exports.loginPrompts = void 0;
 const inquirer_1 = __importDefault(require("inquirer"));
 const fs_1 = require("fs");
 const path_1 = require("path");
@@ -103,6 +103,49 @@ exports.pricingPrompts = [
             }
             return true;
         },
+    },
+];
+exports.licensePrompts = [
+    {
+        name: "maxMachines",
+        message: "Enter maximum number of machines:",
+        type: "number",
+        validate: (input) => {
+            if (isNaN(input) || !Number.isInteger(input)) {
+                return "Please enter a valid integer";
+            }
+            if (input < 1) {
+                return "Number of machines must be at least 1";
+            }
+            return true;
+        },
+    },
+    {
+        name: "expirationDate",
+        message: "Enter expiration date (YYYY-MM-DD):",
+        type: "input",
+        validate: (input) => {
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(input)) {
+                return "Please enter date in YYYY-MM-DD format";
+            }
+            const date = new Date(input);
+            if (isNaN(date.getTime())) {
+                return "Please enter a valid date";
+            }
+            if (date < new Date()) {
+                return "Expiration date must be in the future";
+            }
+            return true;
+        },
+    },
+];
+exports.revokePrompts = [
+    {
+        name: "reason",
+        message: "Enter reason for revocation:",
+        type: "input",
+        validate: (input) => input.length > 0 || "Revocation reason is required",
     },
 ];
 /**

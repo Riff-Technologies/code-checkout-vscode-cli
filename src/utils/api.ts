@@ -11,6 +11,15 @@ import {
   UserLoginRequest,
   UserLoginResponse,
   ConfirmationResponse,
+  CreateLicenseRequest,
+  License,
+  ListLicensesParams,
+  RevokeLicenseRequest,
+  SoftwarePricing,
+  SoftwareDetails,
+  AnalyticsEventsParams,
+  AnalyticsEvent,
+  AnalyticsSummary,
 } from "../types";
 
 // Log the API URL being used (helpful for debugging)
@@ -249,6 +258,201 @@ export async function loginUser(
         message: error.message,
       });
     }
+    handleApiError(error as AxiosError<ApiError>);
+  }
+}
+
+/**
+ * Create a new license
+ */
+export async function createLicense(
+  publisherId: string,
+  softwareId: string,
+  data: CreateLicenseRequest
+): Promise<License> {
+  try {
+    const { jwt } = getConfig();
+    const response = await api.post<License>(
+      `/publishers/${publisherId}/software/${softwareId}/licenses`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error as AxiosError<ApiError>);
+  }
+}
+
+/**
+ * List licenses with optional filtering
+ */
+export async function listLicenses(
+  publisherId: string,
+  softwareId: string,
+  params: ListLicensesParams
+): Promise<{ licenses: License[] }> {
+  try {
+    const { jwt } = getConfig();
+    const response = await api.get<{ licenses: License[] }>(
+      `/publishers/${publisherId}/software/${softwareId}/licenses`,
+      {
+        params,
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error as AxiosError<ApiError>);
+  }
+}
+
+/**
+ * Revoke a license
+ */
+export async function revokeLicense(
+  publisherId: string,
+  licenseId: string,
+  data: RevokeLicenseRequest
+): Promise<License> {
+  try {
+    const { jwt } = getConfig();
+    const response = await api.post<License>(
+      `/publishers/${publisherId}/licenses/${licenseId}/revoke`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error as AxiosError<ApiError>);
+  }
+}
+
+/**
+ * Get software pricing
+ */
+export async function getSoftwarePricing(
+  publisherId: string,
+  softwareId: string
+): Promise<SoftwarePricing> {
+  try {
+    const { jwt } = getConfig();
+    const response = await api.get<SoftwarePricing>(
+      `/publishers/${publisherId}/software/${softwareId}/pricing`,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error as AxiosError<ApiError>);
+  }
+}
+
+/**
+ * Get software details
+ */
+export async function getSoftwareDetails(
+  publisherId: string,
+  softwareId: string
+): Promise<SoftwareDetails> {
+  try {
+    const { jwt } = getConfig();
+    const response = await api.get<SoftwareDetails>(
+      `/publishers/${publisherId}/software/${softwareId}`,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error as AxiosError<ApiError>);
+  }
+}
+
+/**
+ * Get analytics events
+ */
+/**
+ * Get analytics events with optional filtering
+ * @param params - Optional parameters for filtering events
+ * @returns Promise containing array of analytics events
+ */
+export async function getAnalyticsEvents(
+  params: AnalyticsEventsParams
+): Promise<{ events: AnalyticsEvent[] }> {
+  try {
+    const { jwt, publisherId, softwareId, publisher, extensionId } =
+      getConfig();
+
+    // Default time range to last 7 days if not provided
+    const now = new Date();
+    const oneWeekAgo = new Date(now);
+    oneWeekAgo.setDate(now.getDate() - 7);
+
+    const queryParams = new URLSearchParams();
+    queryParams.append("publisherId", publisherId || "");
+    queryParams.append(
+      "startTime",
+      params.startTime || oneWeekAgo.toISOString()
+    );
+    queryParams.append("endTime", params.endTime || now.toISOString());
+    queryParams.append("extensionId", `${publisher}.${extensionId}`);
+    if (params.commandId) {
+      queryParams.append("commandId", params.commandId);
+    }
+
+    const response = await api.get<{ events: AnalyticsEvent[] }>(
+      `/analytics/events?${queryParams.toString()}`,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error as AxiosError<ApiError>);
+  }
+}
+
+/**
+ * Get analytics summary with optional date range filtering
+ * @param params - Optional parameters for filtering date range
+ * @returns Promise containing analytics summary data
+ */
+export async function getAnalyticsSummary(params?: {
+  startTime?: string;
+  endTime?: string;
+}): Promise<AnalyticsSummary> {
+  try {
+    const { jwt, publisherId, softwareId, publisher, extensionId } =
+      getConfig();
+
+    // Default time range to last 7 days if not provided
+    const now = new Date();
+    const oneWeekAgo = new Date(now);
+    oneWeekAgo.setDate(now.getDate() - 7);
+
+    const queryParams = new URLSearchParams();
+    queryParams.append("publisherId", publisherId || "");
+    queryParams.append("softwareId", softwareId || "");
+    queryParams.append(
+      "startTime",
+      params?.startTime || oneWeekAgo.toISOString()
+    );
+    queryParams.append("endTime", params?.endTime || now.toISOString());
+    queryParams.append("extensionId", `${publisher}.${extensionId}`);
+
+    const response = await api.get<AnalyticsSummary>(
+      `/analytics/summary?${queryParams.toString()}`,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
     handleApiError(error as AxiosError<ApiError>);
   }
 }

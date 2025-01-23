@@ -29,6 +29,7 @@ interface PackageJson {
   name: string;
   version: string;
   description?: string;
+  publisher: string;
 }
 
 export default class Init extends Command {
@@ -225,7 +226,11 @@ Try again or contact support if the problem persists.`);
       packageJson.version
     );
 
-    await saveConfig({ softwareId: software.id });
+    await saveConfig({
+      softwareId: software.id,
+      extensionId: packageJson.name,
+      publisher: packageJson.publisher,
+    });
     this.log("✅ Software record created!");
     this.log(`Software ID: ${software.id}`);
   }
@@ -268,8 +273,21 @@ Try again or contact support if the problem persists.`);
     try {
       const packageJsonPath = join(process.cwd(), "package.json");
       const packageJsonContent = readFileSync(packageJsonPath, "utf-8");
-      return JSON.parse(packageJsonContent);
+      const packageJson = JSON.parse(packageJsonContent);
+
+      // Validate required fields
+      if (!packageJson.name) {
+        throw new Error("package.json must contain a name field");
+      }
+      if (!packageJson.publisher) {
+        throw new Error("package.json must contain a publisher field");
+      }
+
+      return packageJson;
     } catch (error) {
+      if (error instanceof Error && error.message.includes("must contain")) {
+        throw error;
+      }
       throw new Error(
         "Could not read package.json. Make sure you're in the root directory of your project."
       );

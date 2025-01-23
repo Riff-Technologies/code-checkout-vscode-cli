@@ -24,6 +24,21 @@ export interface PricingAnswers extends Answers {
 }
 export declare const pricingPrompts: QuestionCollection<PricingAnswers>;
 /**
+ * License creation prompts
+ */
+export interface LicenseAnswers extends Answers {
+    maxMachines: number;
+    expirationDate: string;
+}
+export declare const licensePrompts: QuestionCollection<LicenseAnswers>;
+/**
+ * License revocation prompts
+ */
+export interface RevokeAnswers extends Answers {
+    reason: string;
+}
+export declare const revokePrompts: QuestionCollection<RevokeAnswers>;
+/**
  * Generic prompt wrapper
  */
 export declare function prompt<T extends Answers>(questions: QuestionCollection<T>): Promise<T>;
