@@ -6,6 +6,8 @@ export interface CodeCheckoutConfig {
   jwt: string;
   softwareId?: string;
   username?: string;
+  extensionId?: string;
+  publisher?: string;
 }
 
 /**
@@ -103,4 +105,96 @@ export interface ApiError {
   message: string;
   code?: string;
   status?: number;
+}
+
+/**
+ * License types and interfaces
+ */
+export interface License {
+  licenseKey: string;
+  publisherId: string;
+  softwareId: string;
+  status: "active" | "inactive" | "revoked";
+  maxMachines: number;
+  expirationDate: string;
+  metadata: {
+    createdBy: string;
+    note?: string;
+    customerId?: string;
+    stripePriceId?: string;
+    revokedAt?: string;
+    revokeReason?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateLicenseRequest {
+  maxMachines: number;
+  expirationDate: string;
+}
+
+export interface RevokeLicenseRequest {
+  reason: string;
+}
+
+export interface ListLicensesParams {
+  status?: "active" | "inactive" | "revoked" | "all";
+  limit?: number;
+  offset?: number;
+}
+
+/**
+ * Software pricing and details types
+ */
+export interface SoftwarePricing {
+  model: "subscription" | "one-time";
+  publisherId: string;
+  currency: string;
+  price: number;
+  metadata?: {
+    discount?: string;
+  };
+  freeTrialDays?: number;
+  billingCycle?: "monthly" | "yearly";
+}
+
+export interface SoftwareDetails extends SoftwareResponse {
+  status: "active" | "inactive";
+  metadata: {
+    category: string;
+    platform: string;
+  };
+}
+
+/**
+ * Analytics types
+ */
+export interface AnalyticsEvent {
+  commandId: string;
+  hasValidLicense: boolean;
+  timestamp: string;
+  metadata?: {
+    category?: string;
+    duration?: number;
+  };
+}
+
+export interface AnalyticsSummary {
+  totalEvents: number;
+  commandCounts: Record<string, number>;
+  licenseStatusCounts: {
+    valid: number;
+    invalid: number;
+  };
+  timeRange: {
+    start: string;
+    end: string;
+  };
+}
+
+export interface AnalyticsEventsParams {
+  commandId?: string;
+  startTime?: string;
+  endTime?: string;
 }

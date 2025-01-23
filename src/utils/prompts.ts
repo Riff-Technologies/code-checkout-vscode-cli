@@ -137,6 +137,67 @@ export const pricingPrompts: QuestionCollection<PricingAnswers> = [
 ];
 
 /**
+ * License creation prompts
+ */
+export interface LicenseAnswers extends Answers {
+  maxMachines: number;
+  expirationDate: string;
+}
+
+export const licensePrompts: QuestionCollection<LicenseAnswers> = [
+  {
+    name: "maxMachines",
+    message: "Enter maximum number of machines:",
+    type: "number",
+    validate: (input: number) => {
+      if (isNaN(input) || !Number.isInteger(input)) {
+        return "Please enter a valid integer";
+      }
+      if (input < 1) {
+        return "Number of machines must be at least 1";
+      }
+      return true;
+    },
+  },
+  {
+    name: "expirationDate",
+    message: "Enter expiration date (YYYY-MM-DD):",
+    type: "input",
+    validate: (input: string) => {
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(input)) {
+        return "Please enter date in YYYY-MM-DD format";
+      }
+      const date = new Date(input);
+      if (isNaN(date.getTime())) {
+        return "Please enter a valid date";
+      }
+      if (date < new Date()) {
+        return "Expiration date must be in the future";
+      }
+      return true;
+    },
+  },
+];
+
+/**
+ * License revocation prompts
+ */
+export interface RevokeAnswers extends Answers {
+  reason: string;
+}
+
+export const revokePrompts: QuestionCollection<RevokeAnswers> = [
+  {
+    name: "reason",
+    message: "Enter reason for revocation:",
+    type: "input",
+    validate: (input: string) =>
+      input.length > 0 || "Revocation reason is required",
+  },
+];
+
+/**
  * Generic prompt wrapper
  */
 export async function prompt<T extends Answers>(

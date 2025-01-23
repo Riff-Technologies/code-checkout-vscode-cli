@@ -140,7 +140,11 @@ Try again or contact support if the problem persists.`);
         }
         this.log("Creating software record...");
         const software = await (0, api_1.createSoftware)(publisherId, packageJson.name, packageJson.version);
-        await (0, config_1.saveConfig)({ softwareId: software.id });
+        await (0, config_1.saveConfig)({
+            softwareId: software.id,
+            extensionId: packageJson.name,
+            publisher: packageJson.publisher,
+        });
         this.log("✅ Software record created!");
         this.log(`Software ID: ${software.id}`);
     }
@@ -176,9 +180,20 @@ Try again or contact support if the problem persists.`);
         try {
             const packageJsonPath = (0, path_1.join)(process.cwd(), "package.json");
             const packageJsonContent = (0, fs_1.readFileSync)(packageJsonPath, "utf-8");
-            return JSON.parse(packageJsonContent);
+            const packageJson = JSON.parse(packageJsonContent);
+            // Validate required fields
+            if (!packageJson.name) {
+                throw new Error("package.json must contain a name field");
+            }
+            if (!packageJson.publisher) {
+                throw new Error("package.json must contain a publisher field");
+            }
+            return packageJson;
         }
         catch (error) {
+            if (error instanceof Error && error.message.includes("must contain")) {
+                throw error;
+            }
             throw new Error("Could not read package.json. Make sure you're in the root directory of your project.");
         }
     }
