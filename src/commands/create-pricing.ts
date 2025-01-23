@@ -4,7 +4,7 @@ import { createPricing } from "../utils/api";
 import { getConfig, isAuthenticated, hasSoftware } from "../utils/config";
 
 export default class CreatePricing extends Command {
-  static description = "Create pricing for your software";
+  static description = "Create or updatepricing for your software";
 
   static examples = ["$ code-checkout create-pricing"];
 

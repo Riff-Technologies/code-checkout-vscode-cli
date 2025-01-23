@@ -17,7 +17,8 @@
     "prebuild": "npm run clean",
     "prepare": "npm run build",
     "test": "jest",
-    "start": "NODE_ENV=development ./bin/run"
+    "start": "NODE_ENV=development ./bin/run",
+    "link": "npm link"
   },
   "dependencies": {
     "@oclif/core": "2.11.8",
@@ -55,7 +56,18 @@
     "plugins": [
       "@oclif/plugin-help"
     ],
-    "topicSeparator": " "
+    "topicSeparator": " ",
+    "additionalHelpFlags": [
+      "-h"
+    ],
+    "additionalVersionFlags": [
+      "-v",
+      "--version"
+    ],
+    "helpOptions": {
+      "showAliases": false,
+      "hideAliasesFromRoot": false
+    }
   },
   "keywords": [],
   "author": "",
