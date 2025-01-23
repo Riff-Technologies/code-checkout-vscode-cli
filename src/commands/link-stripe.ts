@@ -1,6 +1,7 @@
 import { Command } from "@oclif/core";
 import { getStripeLink } from "../utils/api";
 import { isAuthenticated } from "../utils/config";
+import { prompt } from "../utils/prompts";
 import open from "open";
 
 export default class LinkStripe extends Command {
@@ -19,8 +20,24 @@ export default class LinkStripe extends Command {
       this.log("Generating Stripe onboarding link...");
       const stripeUrl = await getStripeLink();
 
-      this.log("✅ Opening Stripe onboarding in your default browser...");
-      await open(stripeUrl);
+      // Prompt user before opening URL
+      const { shouldOpen } = await prompt<{ shouldOpen: boolean }>({
+        type: "confirm",
+        name: "shouldOpen",
+        message:
+          "Press Enter to open the Stripe onboarding page in your default browser",
+        default: true,
+      });
+
+      if (shouldOpen) {
+        this.log("✅ Opening Stripe onboarding in your default browser...");
+        await open(stripeUrl);
+      } else {
+        this.log(`\nStripe onboarding URL: ${stripeUrl}`);
+        this.log(
+          "Please open this URL in your browser to complete the Stripe onboarding process."
+        );
+      }
 
       this.log("\nNext step:");
       this.log("Create your software: code-checkout create-software");

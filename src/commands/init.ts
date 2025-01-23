@@ -180,8 +180,25 @@ Try again or contact support if the problem persists.`);
   private async handleStripeLink(): Promise<void> {
     this.log("Generating Stripe onboarding link...");
     const stripeUrl = await getStripeLink();
-    this.log("✅ Opening Stripe onboarding in your default browser...");
-    await open(stripeUrl);
+
+    // Prompt user before opening URL
+    const { shouldOpen } = await prompt<{ shouldOpen: boolean }>({
+      type: "confirm",
+      name: "shouldOpen",
+      message:
+        "Press Enter to open the Stripe onboarding page in your default browser",
+      default: true,
+    });
+
+    if (shouldOpen) {
+      this.log("✅ Opening Stripe onboarding in your default browser...");
+      await open(stripeUrl);
+    } else {
+      this.log(`\nStripe onboarding URL: ${stripeUrl}`);
+      this.log(
+        "Please open this URL in your browser to complete the Stripe onboarding process."
+      );
+    }
 
     // Wait for user to complete Stripe setup
     await prompt({
