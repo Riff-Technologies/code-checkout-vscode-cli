@@ -53,10 +53,6 @@ code-checkout run-script
 code-checkout logout
 ```
 
-## Environment Variables
-
-- `CODE_CHECKOUT_API_URL`: The base URL for the Code Checkout API (defaults to https://api.codecheckout.dev)
-
 ## Development
 
 1. Clone the repository
