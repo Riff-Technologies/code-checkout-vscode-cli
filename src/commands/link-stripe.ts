@@ -1,6 +1,6 @@
 import { Command } from "@oclif/core";
 import { getStripeLink } from "../utils/api";
-import { isAuthenticated } from "../utils/config";
+import { isAuthenticated, getConfig, saveConfig } from "../utils/config";
 import { prompt } from "../utils/prompts";
 import open from "open";
 
@@ -15,6 +15,13 @@ export default class LinkStripe extends Command {
         this.error(
           "❌ You must be logged in to link your Stripe account.\nRun: code-checkout login"
         );
+      }
+
+      // Check if Stripe is already integrated
+      const config = getConfig();
+      if (config.stripeIntegrated) {
+        this.log("✅ Stripe is already integrated!");
+        return;
       }
 
       this.log("Generating Stripe onboarding link...");
@@ -37,6 +44,27 @@ export default class LinkStripe extends Command {
         this.log(
           "Please open this URL in your browser to complete the Stripe onboarding process."
         );
+      }
+
+      // Wait for user to complete Stripe setup
+      const { stripeComplete } = await prompt<{ stripeComplete: boolean }>({
+        type: "confirm",
+        name: "stripeComplete",
+        message: "Have you completed the Stripe onboarding process?",
+        default: false,
+      });
+
+      if (stripeComplete) {
+        await saveConfig({ stripeIntegrated: true });
+        this.log("✅ Stripe integration completed!");
+      } else {
+        this.log(
+          "\n⚠️  Please complete the Stripe onboarding process before proceeding."
+        );
+        this.log(
+          "You can run this command again once you've completed the process."
+        );
+        return;
       }
 
       this.log("\nNext step:");

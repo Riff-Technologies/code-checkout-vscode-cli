@@ -179,6 +179,13 @@ Try again or contact support if the problem persists.`);
   }
 
   private async handleStripeLink(): Promise<void> {
+    // Check if Stripe is already integrated
+    const config = getConfig();
+    if (config.stripeIntegrated) {
+      this.log("✅ Stripe is already integrated!");
+      return;
+    }
+
     this.log("Generating Stripe onboarding link...");
     const stripeUrl = await getStripeLink();
 
@@ -202,12 +209,19 @@ Try again or contact support if the problem persists.`);
     }
 
     // Wait for user to complete Stripe setup
-    await prompt({
+    const { stripeComplete } = await prompt<{ stripeComplete: boolean }>({
       type: "confirm",
       name: "stripeComplete",
       message: "Have you completed the Stripe onboarding process?",
       default: false,
     });
+
+    if (stripeComplete) {
+      await saveConfig({ stripeIntegrated: true });
+      this.log("✅ Stripe integration completed!");
+    } else {
+      throw new Error("Stripe integration must be completed to proceed.");
+    }
   }
 
   private async handleSoftwareCreation(): Promise<void> {

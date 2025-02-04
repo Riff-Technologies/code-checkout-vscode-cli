@@ -87,3 +87,17 @@ export function hasSoftware(): boolean {
   }
   return hasSoftware;
 }
+
+/**
+ * Check if Stripe is integrated
+ */
+export function hasStripeIntegration(): boolean {
+  const config = getConfig();
+  const hasStripe = Boolean(config.stripeIntegrated);
+  if (env.debug) {
+    console.log("Stripe integration check:", {
+      stripeIntegrated: hasStripe,
+    });
+  }
+  return hasStripe;
+}

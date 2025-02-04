@@ -8,6 +8,7 @@ export interface CodeCheckoutConfig {
   username?: string;
   extensionId?: string;
   publisher?: string;
+  stripeIntegrated?: boolean;
 }
 
 /**
