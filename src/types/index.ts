@@ -97,6 +97,7 @@ export interface PricingRequest {
   price: number;
   currency: string;
   billingCycle: BillingCycle;
+  freeTrialDays?: number;
 }
 
 /**

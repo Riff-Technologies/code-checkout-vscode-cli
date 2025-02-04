@@ -4,7 +4,7 @@ import { createPricing } from "../utils/api";
 import { getConfig, isAuthenticated, hasSoftware } from "../utils/config";
 
 export default class CreatePricing extends Command {
-  static description = "Create or updatepricing for your software";
+  static description = "Create or update pricing for your software";
 
   static examples = ["$ code-checkout create-pricing"];
 
@@ -38,11 +38,20 @@ export default class CreatePricing extends Command {
           : parseFloat(answers.price);
 
       this.log("Creating pricing...");
-      await createPricing(publisherId, softwareId, answers.model, price);
+      await createPricing(
+        publisherId,
+        softwareId,
+        answers.model,
+        price,
+        answers.freeTrialDays
+      );
 
       this.log("✅ Pricing created successfully!");
       this.log(`Model: ${answers.model}`);
       this.log(`Price: $${price.toFixed(2)}`);
+      if (answers.model === "subscription" && answers.freeTrialDays) {
+        this.log(`Free Trial: ${answers.freeTrialDays} days`);
+      }
 
       this.log("\nNext step:");
       this.log("Run initialization script: code-checkout run-script");

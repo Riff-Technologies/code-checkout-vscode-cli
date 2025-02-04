@@ -262,10 +262,20 @@ Try again or contact support if the problem persists.`);
         : parseFloat(answers.price);
 
     this.log("Creating pricing...");
-    await createPricing(publisherId, softwareId, answers.model, price);
+    await createPricing(
+      publisherId,
+      softwareId,
+      answers.model,
+      price,
+      answers.freeTrialDays
+    );
+
     this.log("✅ Pricing created!");
     this.log(`Model: ${answers.model}`);
     this.log(`Price: $${price.toFixed(2)}`);
+    if (answers.model === "subscription" && answers.freeTrialDays) {
+      this.log(`Free Trial: ${answers.freeTrialDays} days`);
+    }
   }
 
   private async handleInitScript(): Promise<void> {

@@ -2,7 +2,6 @@ import axios, { AxiosError } from "axios";
 import { getConfig } from "./config";
 import { env } from "./env";
 import {
-  CognitoSignUpResponse,
   SoftwareResponse,
   PricingRequest,
   ApiError,
@@ -198,7 +197,8 @@ export async function createPricing(
   publisherId: string,
   softwareId: string,
   model: PricingRequest["model"],
-  price: number
+  price: number,
+  freeTrialDays?: number
 ): Promise<void> {
   try {
     const { jwt } = getConfig();
@@ -209,6 +209,7 @@ export async function createPricing(
         price,
         currency: "USD",
         billingCycle: model === "subscription" ? "month" : undefined,
+        freeTrialDays,
       } as PricingRequest,
       {
         headers: { Authorization: `Bearer ${jwt}` },

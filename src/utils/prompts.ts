@@ -95,6 +95,7 @@ export interface PricingAnswers extends Answers {
   model: PricingModel;
   price: string;
   customPrice?: string;
+  freeTrialDays?: number;
 }
 
 export const pricingPrompts: QuestionCollection<PricingAnswers> = [
@@ -130,6 +131,22 @@ export const pricingPrompts: QuestionCollection<PricingAnswers> = [
       }
       if (price < 2.99 || price > 99.99) {
         return "Price must be between $2.99 and $99.99";
+      }
+      return true;
+    },
+  },
+  {
+    name: "freeTrialDays",
+    message: "Enter number of free trial days (0 for no trial):",
+    type: "number",
+    when: (answers: PricingAnswers) => answers.model === "subscription",
+    default: 0,
+    validate: (input: number) => {
+      if (isNaN(input) || !Number.isInteger(input)) {
+        return "Please enter a valid integer";
+      }
+      if (input < 0 || input > 90) {
+        return "Free trial days must be between 0 and 90";
       }
       return true;
     },
