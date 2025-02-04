@@ -5,8 +5,7 @@ const dotenv_1 = require("dotenv");
 // Load environment variables from .env file
 (0, dotenv_1.config)();
 // Determine if we're running from a production build by checking if the code is minified/optimized
-const isProductionBuild = false;
-//__filename.includes("/dist/") || __filename.includes("\\dist\\");
+const isProductionBuild = __filename.includes("/dist/") || __filename.includes("\\dist\\");
 /**
  * Environment variables configuration
  */
