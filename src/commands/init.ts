@@ -24,6 +24,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
 import { LoginAnswers, PricingAnswers } from "../utils/prompts";
+import { existsSync } from "fs";
 
 interface PackageJson {
   name: string;
@@ -278,7 +279,89 @@ Try again or contact support if the problem persists.`);
     }
   }
 
+  private getPackageManager(): {
+    name: "npm" | "yarn" | "pnpm" | null;
+    command: string;
+  } {
+    try {
+      // Check for lock files in order of preference
+      if (existsSync(join(process.cwd(), "package-lock.json"))) {
+        return { name: "npm", command: "npm install code-checkout" };
+      }
+      if (existsSync(join(process.cwd(), "yarn.lock"))) {
+        return { name: "yarn", command: "yarn add code-checkout" };
+      }
+      if (existsSync(join(process.cwd(), "pnpm-lock.yaml"))) {
+        return { name: "pnpm", command: "pnpm add code-checkout" };
+      }
+      return { name: null, command: "" };
+    } catch {
+      return { name: null, command: "" };
+    }
+  }
+
   private async handleInitScript(): Promise<void> {
+    this.log("Checking for code-checkout package...");
+
+    // Check if code-checkout is installed
+    let isInstalled = false;
+    try {
+      require.resolve("code-checkout");
+      isInstalled = true;
+    } catch {
+      isInstalled = false;
+    }
+
+    if (!isInstalled) {
+      const { shouldInstall } = await prompt<{ shouldInstall: boolean }>({
+        type: "confirm",
+        name: "shouldInstall",
+        message:
+          "The code-checkout package is required but not installed. Would you like to install it?",
+        default: true,
+      });
+
+      if (!shouldInstall) {
+        this.log(
+          "⚠️ Initialization skipped - code-checkout package is required for initialization."
+        );
+        return;
+      }
+
+      const packageManager = this.getPackageManager();
+
+      if (packageManager.name) {
+        this.log(
+          `Installing code-checkout package using ${packageManager.name}...`
+        );
+        try {
+          execSync(packageManager.command, {
+            stdio: "inherit",
+            encoding: "utf-8",
+          });
+          this.log("✅ code-checkout package installed successfully!");
+        } catch (error) {
+          throw new Error(
+            `Failed to install code-checkout package: ${
+              (error as Error).message
+            }`
+          );
+        }
+      } else {
+        this.log(
+          "\n⚠️ Could not determine your package manager. Please install the package manually:"
+        );
+        this.log("\nUsing npm:");
+        this.log("  npm install code-checkout");
+        this.log("\nUsing yarn:");
+        this.log("  yarn add code-checkout");
+        this.log("\nUsing pnpm:");
+        this.log("  pnpm add code-checkout");
+        this.log("\nAfter installing, run 'code-checkout init' again.");
+        return;
+      }
+    }
+
     this.log("Running initialization script...");
     try {
       execSync("npx code-checkout-init", {
