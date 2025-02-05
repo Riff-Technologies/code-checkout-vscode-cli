@@ -214,7 +214,7 @@ Try again or contact support if the problem persists.`);
       type: "confirm",
       name: "stripeComplete",
       message: "Have you completed the Stripe onboarding process?",
-      default: false,
+      default: true,
     });
 
     if (stripeComplete) {
