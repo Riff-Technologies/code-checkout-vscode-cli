@@ -70,7 +70,7 @@ export const loginPrompts: QuestionCollection<LoginAnswers> = [
   },
   {
     name: "publisher",
-    message: "Enter your publisher ID:",
+    message: "Enter your publisher name:",
     type: "input",
     default: getDefaultPublisher,
     validate: (input: string) => input.length > 0 || "Publisher ID is required",
