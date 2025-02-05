@@ -8,6 +8,7 @@ import {
 import { registerUser, confirmUser, loginUser } from "../utils/api";
 import { getConfig, saveConfig } from "../utils/config";
 import { updatePackageJsonPublisher } from "../utils/package";
+import open from "open";
 
 export default class Login extends Command {
   static description =
@@ -226,6 +227,21 @@ export default class Login extends Command {
         }
       }
     } catch (error) {
+      this.log("\nIf you need help or can't find your confirmation code,");
+      this.log("visit: https://www.code-checkout.com/login");
+
+      // Ask if they want to open the help page
+      const { shouldOpen } = await prompt<{ shouldOpen: boolean }>({
+        type: "confirm",
+        name: "shouldOpen",
+        message:
+          "Would you like to open the account help page in your browser?",
+        default: true,
+      });
+
+      if (shouldOpen) {
+        await open("https://www.code-checkout.com/login");
+      }
       this.error(`❌ Authentication failed: ${(error as Error).message}
 Try again or contact support if the problem persists.`);
     }
