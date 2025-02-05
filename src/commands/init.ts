@@ -20,18 +20,15 @@ import {
   hasSoftware,
 } from "../utils/config";
 import open from "open";
-import { readFileSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
 import { LoginAnswers, PricingAnswers } from "../utils/prompts";
 import { existsSync } from "fs";
-
-interface PackageJson {
-  name: string;
-  version: string;
-  description?: string;
-  publisher: string;
-}
+import {
+  updatePackageJsonPublisher,
+  readPackageJson,
+  PackageJson,
+} from "../utils/package";
 
 export default class Init extends Command {
   static description = "Interactive setup for Code Checkout";
@@ -83,6 +80,13 @@ Try again or contact support if the problem persists.`);
     const answers = await prompt<LoginAnswers>(loginPrompts);
     const { email: username, password } = answers;
     this.log("Creating your account...");
+
+    // Update package.json with publisher if provided
+    if (answers.publisher) {
+      updatePackageJsonPublisher(answers.publisher, {
+        log: this.log.bind(this),
+      });
+    }
 
     // Register the user
     await registerUser({
@@ -377,27 +381,6 @@ Try again or contact support if the problem persists.`);
   }
 
   private readPackageJson(): PackageJson {
-    try {
-      const packageJsonPath = join(process.cwd(), "package.json");
-      const packageJsonContent = readFileSync(packageJsonPath, "utf-8");
-      const packageJson = JSON.parse(packageJsonContent);
-
-      // Validate required fields
-      if (!packageJson.name) {
-        throw new Error("package.json must contain a name field");
-      }
-      if (!packageJson.publisher) {
-        throw new Error("package.json must contain a publisher field");
-      }
-
-      return packageJson;
-    } catch (error) {
-      if (error instanceof Error && error.message.includes("must contain")) {
-        throw error;
-      }
-      throw new Error(
-        "Could not read package.json. Make sure you're in the root directory of your project."
-      );
-    }
+    return readPackageJson();
   }
 }

@@ -7,6 +7,7 @@ import {
 } from "../utils/prompts";
 import { registerUser, confirmUser, loginUser } from "../utils/api";
 import { getConfig, saveConfig } from "../utils/config";
+import { updatePackageJsonPublisher } from "../utils/package";
 
 export default class Login extends Command {
   static description =
@@ -104,6 +105,13 @@ export default class Login extends Command {
         const answers = await prompt<LoginAnswers>(loginPrompts);
         const { email: username, password } = answers;
         this.log("Creating your account...");
+
+        // Update package.json with publisher if provided
+        if (answers.publisher) {
+          updatePackageJsonPublisher(answers.publisher, {
+            log: this.log.bind(this),
+          });
+        }
 
         // Register the user
         await registerUser({
