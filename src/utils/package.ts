@@ -1,3 +1,4 @@
+import { execSync } from "child_process";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 
@@ -76,5 +77,59 @@ export function readPackageJson(): PackageJson {
     throw new Error(
       "Could not read package.json. Make sure you're in the root directory of your project."
     );
+  }
+}
+
+/**
+ * Determines the package manager used in the project
+ * @returns An object containing the package manager name, command, and run script
+ */
+export function getPackageManager(): {
+  name: "npm" | "yarn" | "pnpm" | null;
+  command: string;
+  runScript: string;
+} {
+  try {
+    // Check for lock files in order of preference
+    if (existsSync(join(process.cwd(), "package-lock.json"))) {
+      return {
+        name: "npm",
+        command: "npm install code-checkout",
+        runScript: "npx code-checkout-init",
+      };
+    }
+    if (existsSync(join(process.cwd(), "yarn.lock"))) {
+      // Check if it's Yarn 1 or Yarn 3+
+      try {
+        const yarnVersion = execSync("yarn --version", {
+          encoding: "utf-8",
+        }).trim();
+        const isYarn1 = yarnVersion.startsWith("1.");
+        return {
+          name: "yarn",
+          command: "yarn add code-checkout",
+          runScript: isYarn1
+            ? "yarn run code-checkout-init"
+            : "yarn dlx code-checkout-init",
+        };
+      } catch {
+        // If yarn command fails, default to Yarn 1 behavior
+        return {
+          name: "yarn",
+          command: "yarn add code-checkout",
+          runScript: "yarn run code-checkout-init",
+        };
+      }
+    }
+    if (existsSync(join(process.cwd(), "pnpm-lock.yaml"))) {
+      return {
+        name: "pnpm",
+        command: "pnpm add code-checkout",
+        runScript: "pnpm dlx code-checkout-init",
+      };
+    }
+    return { name: null, command: "", runScript: "" };
+  } catch {
+    return { name: null, command: "", runScript: "" };
   }
 }

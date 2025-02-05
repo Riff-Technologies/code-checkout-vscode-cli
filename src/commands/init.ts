@@ -28,6 +28,7 @@ import {
   updatePackageJsonPublisher,
   readPackageJson,
   PackageJson,
+  getPackageManager,
 } from "../utils/package";
 
 export default class Init extends Command {
@@ -283,27 +284,6 @@ Try again or contact support if the problem persists.`);
     }
   }
 
-  private getPackageManager(): {
-    name: "npm" | "yarn" | "pnpm" | null;
-    command: string;
-  } {
-    try {
-      // Check for lock files in order of preference
-      if (existsSync(join(process.cwd(), "package-lock.json"))) {
-        return { name: "npm", command: "npm install code-checkout" };
-      }
-      if (existsSync(join(process.cwd(), "yarn.lock"))) {
-        return { name: "yarn", command: "yarn add code-checkout" };
-      }
-      if (existsSync(join(process.cwd(), "pnpm-lock.yaml"))) {
-        return { name: "pnpm", command: "pnpm add code-checkout" };
-      }
-      return { name: null, command: "" };
-    } catch {
-      return { name: null, command: "" };
-    }
-  }
-
   private async handleInitScript(): Promise<void> {
     this.log("Checking for code-checkout package...");
 
@@ -316,6 +296,7 @@ Try again or contact support if the problem persists.`);
       isInstalled = false;
     }
 
+    const packageManager = getPackageManager();
     if (!isInstalled) {
       const { shouldInstall } = await prompt<{ shouldInstall: boolean }>({
         type: "confirm",
@@ -331,8 +312,6 @@ Try again or contact support if the problem persists.`);
         );
         return;
       }
-
-      const packageManager = this.getPackageManager();
 
       if (packageManager.name) {
         this.log(
@@ -368,7 +347,11 @@ Try again or contact support if the problem persists.`);
 
     this.log("Running initialization script...");
     try {
-      execSync("npx code-checkout-init", {
+      const initCommand = packageManager.name
+        ? packageManager.runScript
+        : "npx code-checkout-init";
+
+      execSync(initCommand, {
         stdio: "inherit",
         encoding: "utf-8",
       });

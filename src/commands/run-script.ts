@@ -1,6 +1,7 @@
 import { Command } from "@oclif/core";
 import { execSync } from "child_process";
 import { isAuthenticated, hasSoftware } from "../utils/config";
+import { getPackageManager } from "@/utils/package";
 
 export default class RunScript extends Command {
   static description = "Run the initialization script in your project";
@@ -37,7 +38,12 @@ export default class RunScript extends Command {
 
   private runInitScript(): void {
     try {
-      execSync("npx code-checkout-init", {
+      const packageManager = getPackageManager();
+      const initCommand = packageManager.name
+        ? packageManager.runScript
+        : "npx code-checkout-init";
+
+      execSync(initCommand, {
         stdio: "inherit",
         encoding: "utf-8",
       });
