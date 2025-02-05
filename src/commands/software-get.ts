@@ -5,7 +5,7 @@ import { getConfig, isAuthenticated, hasSoftware } from "../utils/config";
 export default class SoftwareGet extends Command {
   static description = "Get details about your software";
 
-  static examples = ["$ code-checkout software:get"];
+  static examples = ["$ code-checkout software-get"];
 
   async run(): Promise<void> {
     try {

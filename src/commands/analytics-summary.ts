@@ -6,8 +6,8 @@ export default class AnalyticsSummary extends Command {
   static description = "Get analytics summary for your software";
 
   static examples = [
-    "$ code-checkout analytics:summary",
-    "$ code-checkout analytics:summary --startTime 2024-01-09 --endTime 2024-01-16",
+    "$ code-checkout analytics-summary",
+    "$ code-checkout analytics-summary --startTime 2024-01-09 --endTime 2024-01-16",
   ];
 
   static flags = {

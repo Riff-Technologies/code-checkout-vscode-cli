@@ -7,8 +7,8 @@ export default class LicenseRevoke extends Command {
   static description = "Revoke a license";
 
   static examples = [
-    "$ code-checkout license:revoke --licenseId M5VXSPRT-FMUUGKAX8V",
-    '$ code-checkout license:revoke --licenseId M5VXSPRT-FMUUGKAX8V --reason "Payment chargeback"',
+    "$ code-checkout license-revoke --licenseId M5VXSPRT-FMUUGKAX8V",
+    '$ code-checkout license-revoke --licenseId M5VXSPRT-FMUUGKAX8V --reason "Payment chargeback"',
   ];
 
   static flags = {

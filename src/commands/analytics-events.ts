@@ -6,9 +6,9 @@ export default class AnalyticsEvents extends Command {
   static description = "Get analytics events for your software";
 
   static examples = [
-    "$ code-checkout analytics:events",
-    "$ code-checkout analytics:events --commandId my-command",
-    "$ code-checkout analytics:events --startTime 2024-01-09 --endTime 2024-01-16",
+    "$ code-checkout analytics-events",
+    "$ code-checkout analytics-events --commandId my-command",
+    "$ code-checkout analytics-events --startTime 2024-01-09 --endTime 2024-01-16",
   ];
 
   static flags = {

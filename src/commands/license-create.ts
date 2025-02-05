@@ -7,8 +7,8 @@ export default class LicenseCreate extends Command {
   static description = "Create a new license for your software";
 
   static examples = [
-    "$ code-checkout license:create",
-    "$ code-checkout license:create --maxMachines 5 --expirationDate 2025-12-31",
+    "$ code-checkout license-create",
+    "$ code-checkout license-create --maxMachines 5 --expirationDate 2025-12-31",
   ];
 
   static flags = {

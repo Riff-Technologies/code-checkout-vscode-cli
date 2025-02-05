@@ -5,7 +5,7 @@ import { getConfig, isAuthenticated, hasSoftware } from "../utils/config";
 export default class SoftwarePricing extends Command {
   static description = "Get pricing details for your software";
 
-  static examples = ["$ code-checkout software:pricing"];
+  static examples = ["$ code-checkout software-pricing"];
 
   async run(): Promise<void> {
     try {

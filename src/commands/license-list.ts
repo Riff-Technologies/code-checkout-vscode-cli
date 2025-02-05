@@ -8,9 +8,9 @@ export default class LicenseList extends Command {
   static description = "List licenses for your software";
 
   static examples = [
-    "$ code-checkout license:list",
-    "$ code-checkout license:list --status active",
-    "$ code-checkout license:list --limit 10 --offset 0",
+    "$ code-checkout license-list",
+    "$ code-checkout license-list --status active",
+    "$ code-checkout license-list --limit 10 --offset 0",
   ];
 
   static flags = {
