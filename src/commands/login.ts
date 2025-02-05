@@ -70,10 +70,29 @@ export default class Login extends Command {
           });
 
           this.log("✅ Successfully logged in!");
-          this.log(`Your Publisher ID is: ${publisherId}`);
-          this.log("\nNext steps:");
-          this.log("1. Link your Stripe account: code-checkout link-stripe");
-          this.log("2. Create your software: code-checkout create-software");
+
+          // Show relevant next steps based on configuration
+          const currentConfig = getConfig();
+          const nextSteps: string[] = [];
+
+          if (!currentConfig.stripeIntegrated) {
+            nextSteps.push(
+              "1. Link your Stripe account: code-checkout link-stripe"
+            );
+          }
+
+          if (!currentConfig.softwareId) {
+            nextSteps.push(
+              `${
+                nextSteps.length + 1
+              }. Create your software: code-checkout create-software`
+            );
+          }
+
+          if (nextSteps.length > 0) {
+            this.log("\nNext steps:");
+            nextSteps.forEach((step) => this.log(step));
+          }
         } catch (error) {
           throw new Error(
             "Failed to extract publisher ID from token. Please contact support."
@@ -169,9 +188,29 @@ export default class Login extends Command {
 
           this.log("✅ Successfully logged in!");
           this.log(`Your Publisher ID is: ${publisherId}`);
-          this.log("\nNext steps:");
-          this.log("1. Link your Stripe account: code-checkout link-stripe");
-          this.log("2. Create your software: code-checkout create-software");
+
+          // Show relevant next steps based on configuration
+          const currentConfig = getConfig();
+          const nextSteps: string[] = [];
+
+          if (!currentConfig.stripeIntegrated) {
+            nextSteps.push(
+              "1. Link your Stripe account: code-checkout link-stripe"
+            );
+          }
+
+          if (!currentConfig.softwareId) {
+            nextSteps.push(
+              `${
+                nextSteps.length + 1
+              }. Create your software: code-checkout create-software`
+            );
+          }
+
+          if (nextSteps.length > 0) {
+            this.log("\nNext steps:");
+            nextSteps.forEach((step) => this.log(step));
+          }
         } catch (error) {
           throw new Error(
             "Failed to extract publisher ID from token. Please contact support."
