@@ -143,7 +143,7 @@ export async function getStripeLink(): Promise<string> {
     }
 
     const response = await api.get<{ url: string }>(
-      `/publishers/${config.publisherId}/stripe/connect-url?returnUrl=https://www.code-checkout.com`,
+      `/publishers/${config.publisherId}/stripe/connect-url?returnUrl=https://www.codecheckout.dev`,
       {
         headers: { Authorization: `Bearer ${config.jwt}` },
       }

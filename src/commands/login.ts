@@ -228,7 +228,7 @@ export default class Login extends Command {
       }
     } catch (error) {
       this.log("\nIf you need help or can't find your confirmation code,");
-      this.log("visit: https://www.code-checkout.com/login");
+      this.log("visit: https://www.codecheckout.dev/login");
 
       // Ask if they want to open the help page
       const { shouldOpen } = await prompt<{ shouldOpen: boolean }>({
@@ -240,7 +240,7 @@ export default class Login extends Command {
       });
 
       if (shouldOpen) {
-        await open("https://www.code-checkout.com/login");
+        await open("https://www.codecheckout.dev/login");
       }
       this.error(`❌ Authentication failed: ${(error as Error).message}
 Try again or contact support if the problem persists.`);
