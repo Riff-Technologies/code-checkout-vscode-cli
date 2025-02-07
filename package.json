@@ -1,7 +1,7 @@
 {
   "name": "@riff-tech/code-checkout-cli",
   "publisher": "riff-tech",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "CLI tool for Code Checkout platform integration",
   "main": "dist/index.js",
   "bin": {
@@ -18,7 +18,8 @@
     "prepare": "npm run build",
     "test": "jest",
     "start": "NODE_ENV=development ./bin/run",
-    "link": "npm link"
+    "link": "npm link",
+    "publish": "npm run build && npm publish --access public"
   },
   "dependencies": {
     "@oclif/core": "2.11.8",
