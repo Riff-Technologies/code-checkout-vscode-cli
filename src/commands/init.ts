@@ -20,10 +20,8 @@ import {
   hasSoftware,
 } from "../utils/config";
 import open from "open";
-import { join } from "path";
 import { execSync } from "child_process";
 import { LoginAnswers, PricingAnswers } from "../utils/prompts";
-import { existsSync } from "fs";
 import {
   updatePackageJsonPublisher,
   readPackageJson,

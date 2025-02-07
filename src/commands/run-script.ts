@@ -1,7 +1,7 @@
 import { Command } from "@oclif/core";
 import { execSync } from "child_process";
 import { isAuthenticated, hasSoftware } from "../utils/config";
-import { getPackageManager } from "@/utils/package";
+import { getPackageManager } from "../utils/package";
 
 export default class RunScript extends Command {
   static description = "Run the initialization script in your project";

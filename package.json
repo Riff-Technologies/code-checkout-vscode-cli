@@ -1,7 +1,7 @@
 {
   "name": "@riff-tech/code-checkout-cli",
   "publisher": "riff-tech",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "CLI tool for Code Checkout platform integration",
   "main": "dist/index.js",
   "bin": {

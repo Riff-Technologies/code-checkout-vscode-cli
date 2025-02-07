@@ -136,7 +136,6 @@ export async function confirmUser(
 export async function getStripeLink(): Promise<string> {
   try {
     const config = getConfig();
-    console.log("Config:", config);
 
     if (!config.publisherId || !config.jwt) {
       throw new Error("Missing authentication. Please log in again.");
