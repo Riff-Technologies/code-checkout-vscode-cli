@@ -87,18 +87,21 @@ Try again or contact support if the problem persists.`);
       });
     }
 
-    // Register the user
-    await registerUser({
-      username,
-      email: username,
-      password,
-      givenName: answers.givenName,
-      familyName: answers.familyName,
-      company: answers.company,
-      publisher: answers.publisher || "",
-    });
-
-    this.log("✅ Account created! Check your email for a confirmation code.");
+    try {
+      // Register the user
+      await registerUser({
+        username,
+        email: username,
+        password,
+        givenName: answers.givenName,
+        familyName: answers.familyName,
+        company: answers.company,
+        publisher: answers.publisher || "",
+      });
+      this.log("✅ Account created! Check your email for a confirmation code.");
+    } catch (error) {
+      this.error(`❌ Account creation failed: ${(error as Error).message}`);
+    }
 
     // Get confirmation code and retry if invalid
     let confirmationAttempts = 0;
