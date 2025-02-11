@@ -94,7 +94,7 @@ export function getPackageManager(): {
     if (existsSync(join(process.cwd(), "package-lock.json"))) {
       return {
         name: "npm",
-        command: "npm install code-checkout",
+        command: "npm install @riff-tech/code-checkout",
         runScript: "npx code-checkout-init",
       };
     }
@@ -107,7 +107,7 @@ export function getPackageManager(): {
         const isYarn1 = yarnVersion.startsWith("1.");
         return {
           name: "yarn",
-          command: "yarn add code-checkout",
+          command: "yarn add @riff-tech/code-checkout",
           runScript: isYarn1
             ? "yarn run code-checkout-init"
             : "yarn dlx code-checkout-init",
@@ -116,7 +116,7 @@ export function getPackageManager(): {
         // If yarn command fails, default to Yarn 1 behavior
         return {
           name: "yarn",
-          command: "yarn add code-checkout",
+          command: "yarn add @riff-tech/code-checkout",
           runScript: "yarn run code-checkout-init",
         };
       }
@@ -124,7 +124,7 @@ export function getPackageManager(): {
     if (existsSync(join(process.cwd(), "pnpm-lock.yaml"))) {
       return {
         name: "pnpm",
-        command: "pnpm add code-checkout",
+        command: "pnpm add @riff-tech/code-checkout",
         runScript: "pnpm dlx code-checkout-init",
       };
     }
