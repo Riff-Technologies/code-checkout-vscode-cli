@@ -49,23 +49,30 @@ function handleApiError(error: AxiosError<ApiError>): never {
     });
   }
 
-  if (error.response?.data?.message) {
-    throw new Error(error.response.data.message);
+  // Check for error message in data.message or data.error
+  if (error.response?.data) {
+    const errorData = error.response.data;
+    if ("message" in errorData && errorData.message) {
+      throw new Error(errorData.message);
+    }
+    if ("error" in errorData && typeof errorData.error === "string") {
+      throw new Error(errorData.error);
+    }
   }
 
-  if (error.response?.status === 401) {
-    throw new Error("Authentication failed. Please log in again.");
+  // Handle specific HTTP status codes
+  switch (error.response?.status) {
+    case 400:
+      throw new Error("Invalid request. Please check your input.");
+    case 401:
+      throw new Error("Authentication failed. Please log in again.");
+    case 403:
+      throw new Error("Not authorized. Please check your permissions.");
+    case 404:
+      throw new Error("Resource not found. Please check the request.");
+    default:
+      throw new Error(error.message || "An unexpected error occurred");
   }
-
-  if (error.response?.status === 403) {
-    throw new Error("Not authorized. Please check your permissions.");
-  }
-
-  if (error.response?.status === 404) {
-    throw new Error("Resource not found. Please check the request.");
-  }
-
-  throw new Error(error.message || "An unexpected error occurred");
 }
 
 /**

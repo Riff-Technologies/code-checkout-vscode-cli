@@ -99,27 +99,11 @@ export function getPackageManager(): {
       };
     }
     if (existsSync(join(process.cwd(), "yarn.lock"))) {
-      // Check if it's Yarn 1 or Yarn 3+
-      try {
-        const yarnVersion = execSync("yarn --version", {
-          encoding: "utf-8",
-        }).trim();
-        const isYarn1 = yarnVersion.startsWith("1.");
-        return {
-          name: "yarn",
-          command: "yarn add @riff-tech/code-checkout",
-          runScript: isYarn1
-            ? "yarn run code-checkout-init"
-            : "yarn dlx code-checkout-init",
-        };
-      } catch {
-        // If yarn command fails, default to Yarn 1 behavior
-        return {
-          name: "yarn",
-          command: "yarn add @riff-tech/code-checkout",
-          runScript: "yarn run code-checkout-init",
-        };
-      }
+      return {
+        name: "yarn",
+        command: "yarn add @riff-tech/code-checkout",
+        runScript: "yarn run code-checkout-init",
+      };
     }
     if (existsSync(join(process.cwd(), "pnpm-lock.yaml"))) {
       return {
