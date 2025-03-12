@@ -1,8 +1,8 @@
 {
-  "name": "@riff-tech/code-checkout-cli",
+  "name": "@riff-tech/code-checkout-vscode-cli",
   "publisher": "riff-tech",
-  "version": "1.0.11",
-  "description": "CLI tool for Code Checkout platform integration",
+  "version": "1.0.12",
+  "description": "CLI tool for code-checkout platform integration for VSCode Extensions",
   "main": "dist/index.js",
   "bin": {
     "code-checkout": "./bin/run"

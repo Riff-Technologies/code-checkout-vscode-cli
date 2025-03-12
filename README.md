@@ -1,11 +1,11 @@
-# Code Checkout CLI
+# Code Checkout VSCode CLI
 
-A command-line interface for integrating your software with the Code Checkout platform.
+A command-line interface for integrating your VSCode Extension with the code-checkout platform.
 
 ## Installation
 
 ```bash
-npm install -g code-checkout-cli
+npm install -g code-checkout-vscode-cli
 ```
 
 ## Usage

@@ -94,21 +94,21 @@ export function getPackageManager(): {
     if (existsSync(join(process.cwd(), "package-lock.json"))) {
       return {
         name: "npm",
-        command: "npm install @riff-tech/code-checkout",
+        command: "npm install @riff-tech/code-checkout-vscode",
         runScript: "npx code-checkout-init",
       };
     }
     if (existsSync(join(process.cwd(), "yarn.lock"))) {
       return {
         name: "yarn",
-        command: "yarn add @riff-tech/code-checkout",
+        command: "yarn add @riff-tech/code-checkout-vscode",
         runScript: "yarn run code-checkout-init",
       };
     }
     if (existsSync(join(process.cwd(), "pnpm-lock.yaml"))) {
       return {
         name: "pnpm",
-        command: "pnpm add @riff-tech/code-checkout",
+        command: "pnpm add @riff-tech/code-checkout-vscode",
         runScript: "pnpm dlx code-checkout-init",
       };
     }
